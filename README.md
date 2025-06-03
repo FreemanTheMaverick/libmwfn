@@ -1,2 +1,2 @@
 # libmwfn
-A flexible .mwfn format parser
+A flexible .mwfn format handler
