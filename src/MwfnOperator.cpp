@@ -191,6 +191,7 @@ static EigenMatrix Lowdin(EigenMatrix C, EigenMatrix S){
 
 void Mwfn::Orthogonalize(std::string scheme){
 	const EigenMatrix S = this->Overlap;
+	if ( S.size() == 0 ) throw std::runtime_error("Overlap matrix is missing!");
 	std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::toupper);
 	for  ( int spin : this->getSpins() ){
 		EigenMatrix C = this->getCoefficientMatrix(spin);
