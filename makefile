@@ -25,7 +25,7 @@ CPPFLAGS    = -isystem $(EIGEN3_PATH) \
               -DEIGEN_INITIALIZE_MATRICES_BY_ZERO \
               -MMD -MP # Generate dependency files
 
-CXXFLAGS    = -Wall -Wextra -Wpedantic -fPIC -march=native -O3
+CXXFLAGS    = -Wall -Wextra -Wpedantic -fPIC -march=native -O3 -std=c++2a
 
 # --- Main Rules ---
 
@@ -36,7 +36,8 @@ all: $(OBJECTS) | $(INCDIR) $(LIBDIR)
 	ar -rv $(LIBDIR)/libmwfn.a $^
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -o $(LIBDIR)/libmwfn.so $^
 	@echo "The lib files libmwfn.a and libmwfn.so are put in $(LIBDIR)/."
-	cat src/MwfnShell.h > $(INCDIR)/libmwfn.h
+	cat src/NecessaryHeaders.h > $(INCDIR)/libmwfn.h
+	cat src/MwfnShell.h >> $(INCDIR)/libmwfn.h
 	cat src/MwfnCenter.h >> $(INCDIR)/libmwfn.h
 	cat src/MwfnOrbital.h >> $(INCDIR)/libmwfn.h
 	cat src/Mwfn.h >> $(INCDIR)/libmwfn.h

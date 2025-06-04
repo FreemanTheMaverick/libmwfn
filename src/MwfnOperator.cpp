@@ -8,6 +8,7 @@
 #include <fstream>
 #include <map>
 #include <regex>
+#include <memory>
 
 #include "Macro.h"
 #include "MwfnShell.h"
@@ -15,14 +16,14 @@
 #include "MwfnOrbital.h"
 #include "Mwfn.h"
 
+// By default spin = 0
 #define __Check_Spin_Type_Shift__\
-	if ( this->Wfntype == 0 && spin != 0 ) throw std::runtime_error("Invalid spin type!");\
-	if ( this->Wfntype == 1 && spin != 1 && spin != 2 ) throw std::runtime_error("Invalid spin type!");\
-	const int shift = ( this->Wfntype == 0 ? 0 : spin - 1 ) * this->getNumIndBasis();
+	if ( spin != 0 && spin != 1 && spin != 2 ) throw std::runtime_error("Invalid spin type!");\
+	const int shift = ( this->Wfntype == 1 && spin == 2 ) ? this->getNumIndBasis() : 0;
 
-double Mwfn::getNumElec(int spin){ // Total number of electrons if spin == -1 .
+double Mwfn::getNumElec(int spin){
 	double nelec = 0;
-	if ( spin == -1 ){
+	if ( spin == 0 ){ // Total number of electrons if spin == 0.
 		for ( int i = 0; i < (int)this->Orbitals.size(); i++ )
 			nelec += this->Orbitals[i].Occ;
 	}else{
@@ -37,7 +38,7 @@ double Mwfn::getCharge(){
 	double nuclear_charge = 0;
 	for ( MwfnCenter& center : this->Centers )
 		nuclear_charge += center.Nuclear_charge;
-	double nelec = this->getNumElec(-1);
+	double nelec = this->getNumElec();
 	return nuclear_charge - nelec;
 }
 
@@ -123,6 +124,7 @@ void Mwfn::setOccupation(EigenVector occupancies, int spin){
 
 EigenMatrix Mwfn::getFock(int spin){
 	const EigenMatrix S = this->Overlap;
+	if ( S.size() == 0 ) throw std::runtime_error("Overlap matrix is missing!");
 	const EigenDiagonal E = this->getEnergy(spin).asDiagonal();
 	const EigenMatrix C = this->getCoefficientMatrix(spin);
 	return S * C * E * C.transpose() * S;
@@ -159,4 +161,45 @@ std::vector<int> Mwfn::Atom2Basis(){
 		ibasis += center.getNumBasis();
 	}
 	return atom2bf;
+}
+
+std::vector<int> Mwfn::getSpins(){
+	switch ( this->Wfntype ){
+		case 0: return std::vector<int>{0};
+		case 1: return std::vector<int>{1, 2};
+		default: throw std::runtime_error("Invalid wavefunction type!");
+	}
+}
+
+static EigenMatrix GramSchmidt(EigenMatrix C, EigenMatrix S){
+	Eigen::SelfAdjointEigenSolver<EigenMatrix> es(S);
+	const EigenMatrix Ssqrt = es.operatorSqrt();
+	const EigenMatrix Sinvsqrt = es.operatorInverseSqrt();
+	const EigenMatrix Cprime = Ssqrt * C;
+	Eigen::HouseholderQR<EigenMatrix> qr(Cprime);
+	const EigenMatrix Cprime_new = qr.householderQ();
+	const EigenMatrix C_new = Sinvsqrt * Cprime_new;
+	return C_new;
+}
+
+static EigenMatrix Lowdin(EigenMatrix C, EigenMatrix S){
+	Eigen::SelfAdjointEigenSolver<EigenMatrix> es(C.transpose() * S * C);
+	const EigenMatrix X = es.operatorInverseSqrt();
+	const EigenMatrix C_new = C * X;
+	return C_new;
+}
+
+void Mwfn::Orthogonalize(std::string scheme){
+	const EigenMatrix S = this->Overlap;
+	std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::toupper);
+	for  ( int spin : this->getSpins() ){
+		EigenMatrix C = this->getCoefficientMatrix(spin);
+		if ( scheme == "GRAMSCHMIDT" || scheme == "GS" || scheme == "GRAM" ) C = GramSchmidt(C, S);
+		else if ( scheme == "LOWDIN" || scheme == "SYMMETRIC" || scheme == "SYM" ) C = Lowdin(C, S);
+		this->setCoefficientMatrix(C, spin);
+	}
+}
+
+std::unique_ptr<Mwfn> Mwfn::Clone(){
+	return std::make_unique<Mwfn>(*this);
 }

@@ -57,7 +57,7 @@
 	int total = lower ? ( ( 1 + ncols ) * ncols / 2 ) : ( nrows * ncols );\
 	__Read_Array_Head__\
 		if (lower){\
-			mat(irow, jcol)=mat(jcol, irow) = SafeStoD(word);\
+			mat(irow, jcol) = mat(jcol, irow) = SafeStoD(word);\
 			if ( irow == jcol ){\
 				irow++;\
 				jcol = 0;\
@@ -147,14 +147,22 @@ EigenMatrix MatrixTransform(std::vector<MwfnCenter> centers){ // Chinium orders 
 	return transform;
 }
 
-static double SafeStoD(std::string word){ // In FT theory, some occupation numbers can be of dimension of 1E-50 or less. These small values cannot be stored as doubles and are likely to cause "out_of_range" error.
-	double value = 1919810;
-	try{
-		value = std::stod(word);
-	}catch ( const std::out_of_range& e ){
-		value = 0;
+static double SafeStoD(std::string& str){ // Some values are too small. Some are flawed like "1.23-136" where the "E" is missing.
+	// Find the last minus sign that is not at the beginning
+	std::size_t minus_pos = str.rfind('-');
+	if (minus_pos != std::string::npos && minus_pos != 0) {
+		// Check if there is already an 'E' or 'e' before the minus sign
+		std::size_t e_pos = str.find_first_of("Ee", 1);
+		if (e_pos == std::string::npos || e_pos > minus_pos) {
+			// Replace the minus sign with "E-"
+			str.replace(minus_pos, 1, "E-");
+		}
 	}
-	return value;
+	try{
+		return std::stod(str);
+	}catch ( const std::out_of_range& e ){
+		return 0;
+	}
 }
 
 Mwfn::Mwfn(std::string mwfn_filename){
@@ -315,7 +323,7 @@ Mwfn::Mwfn(std::string mwfn_filename){
 			ss >> word; // "lower="
 			ss >> word; // lower
 			const int lower = std::stoi(word);
-			this->Overlap = EigenZero(nrows, ncols);
+			this->Overlap.resize(nrows, ncols);
 			__Load_Matrix__(this->Overlap)
 			this->Overlap = mwfntransform.transpose() * this->Overlap * mwfntransform;
 			continue;

@@ -30,7 +30,7 @@ ParallelCompile(
 
 CPP = sorted(glob("src/*.cpp"))
 HEADER = sorted(glob("src/*.h"))
-ext_module = [ Pybind11Extension(
+ext_module = Pybind11Extension(
 	"libmwfn",
 	CPP,
 	include_dirs = [EIGEN3],
@@ -38,7 +38,7 @@ ext_module = [ Pybind11Extension(
 	extra_compile_args = ["-O3", "-DPYTHON", "-DEIGEN_INITIALIZE_MATRICES_BY_ZERO"],
 	language = "c++",
 	cxx_std = 20
-)]
+)
 
 setup(
 		name = "libmwfn",

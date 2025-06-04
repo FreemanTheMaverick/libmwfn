@@ -14,7 +14,7 @@ class Mwfn{ public:
 	EigenMatrix Overlap;
 
 	double getCharge();
-	double getNumElec(int spin = -1);
+	double getNumElec(int spin = 0);
 
 	int getNumCenters();
 
@@ -36,7 +36,10 @@ class Mwfn{ public:
 	EigenMatrix getEnergyDensity(int spin = 0);
 	std::vector<int> Basis2Atom();
 	std::vector<int> Atom2Basis();
+	std::vector<int> getSpins();
+	void Orthogonalize(std::string scheme);
 
+	std::unique_ptr<Mwfn> Clone();
 	Mwfn() = default;
 	Mwfn(std::string mwfn_filename);
 	void Export(std::string mwfn_filename);
