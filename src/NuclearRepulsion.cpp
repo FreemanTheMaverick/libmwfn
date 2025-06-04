@@ -6,8 +6,8 @@
 #include <cmath> // std::abs in "../Macro.h"
 #include <array> // std::array
 #include <utility> // std::pair, std::make_pair
-#include <chrono>
 
+#include "NecessaryHeaders.h"
 #include "Macro.h"
 #include "MwfnShell.h"
 #include "MwfnCenter.h"

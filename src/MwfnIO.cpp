@@ -8,8 +8,8 @@
 #include <fstream>
 #include <map>
 #include <regex>
-#include <iostream>
 
+#include "NecessaryHeaders.h"
 #include "Macro.h"
 #include "MwfnShell.h"
 #include "MwfnCenter.h"
