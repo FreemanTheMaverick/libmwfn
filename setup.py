@@ -7,7 +7,7 @@ from setuptools.command.build import build
 import pybind11
 from pybind11.setup_helpers import Pybind11Extension, ParallelCompile, naive_recompile
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 # Downloading Eigen3
 pwd = os.path.dirname(__file__)
