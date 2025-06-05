@@ -37,10 +37,10 @@ all: $(OBJECTS) | $(INCDIR) $(LIBDIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -o $(LIBDIR)/libmwfn.so $^
 	@echo "The lib files libmwfn.a and libmwfn.so are put in $(LIBDIR)/."
 	cat src/NecessaryHeaders.h > $(INCDIR)/libmwfn.h
-	cat src/MwfnShell.h >> $(INCDIR)/libmwfn.h
-	cat src/MwfnCenter.h >> $(INCDIR)/libmwfn.h
-	cat src/MwfnOrbital.h >> $(INCDIR)/libmwfn.h
-	cat src/Mwfn.h >> $(INCDIR)/libmwfn.h
+	cat src/MwfnShell.h       >> $(INCDIR)/libmwfn.h
+	cat src/MwfnCenter.h      >> $(INCDIR)/libmwfn.h
+	cat src/MwfnOrbital.h     >> $(INCDIR)/libmwfn.h
+	cat src/Mwfn.h            >> $(INCDIR)/libmwfn.h
 	sed -i "s/EigenMatrix/Eigen::MatrixXd/g" $(INCDIR)/libmwfn.h
 	sed -i "s/EigenVector/Eigen::VectorXd/g" $(INCDIR)/libmwfn.h
 	@echo "The header libmwfn.h is put in $(INCDIR)/."

@@ -433,8 +433,8 @@ void Mwfn::Export(std::string mwfn_filename){
 		std::fprintf(file, "Occ= %E\n", orbital.Occ);
 		std::fprintf(file, "Sym= %s\n", orbital.Sym.c_str());
 		std::fprintf(file, "$Coeff\n");
+		const EigenVector c = mwfntransform * orbital.Coeff;
 		for ( int j = 0; j < this->getNumBasis(); j++ ){
-			const EigenVector c = mwfntransform * orbital.Coeff;
 			std::fprintf(file, " %.10E", c(j));
 		}
 		std::fprintf(file, "\n\n");
