@@ -51,6 +51,7 @@ A wavefunction file given by an *ab initio* calculation is needed.
 This can be done by a variety of computational chemistry packages.
 Here we use `Gaussian 16` as an example.
 ```
+! Gaussian input file
 %nprocshared=40
 %mem=60GB
 %chk=job.chk
@@ -63,10 +64,11 @@ Title Card Required
 ```
 
 ### Converting wavefunction file
-The resultant wavefunction is stored in `job.chk`, an `chk` format file which is not supported by `Orbaplaw`.
-We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format[^mwfn] with `Multiwfn`[^multiwfn].
+The resultant wavefunction is stored in `job.chk`, an `chk` format file which is not supported by **libmwfn**.
+We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format with `Multiwfn`.
 
 ```
+$ # Shell
 $ formchk job.chk # Now we have job.fchk
 $ Multiwfn job.fchk
 100 # Other functions (Part 1)
@@ -82,31 +84,37 @@ Now we have `job.mwfn`.
 ### Wavefunction processing
 + Loading the `libmwfn` module.
 ```c++
+// C++
 #include <libmwfn.h>
 ```
 ```python
+# Python
 import libmwfn as lm
 ```
 
 + Reading and exporting wavefunction information from `job.mwfn` to `job_new.mwfn`.
 ```c++
+// C++
 Mwfn job_mwfn("job.mwfn");
 job_mwfn.Export("job_new.mwfn");
 ```
 ```python
+# Python
 job_mwfn = lm.Mwfn("job.mwfn")
 job_mwfn.Export("job_new.mwfn")
 ```
 
 + Getting the numbers of electrons.
 ```c++
+// C++
 int spin = 0; // 0 - default spin (depending on wavefunction types and functions); 1 - alpha; 2 - beta.
 double n = job_mwfn.getNumElec(spin); // spin is optional. Default is 0, the total number of electrons of two spin types.
-double n_alpha = mwfn.getNumElec(1) # The number of alpha electrons.
-double n_beta = mwfn.getNumElec(2) # The number of beta electrons.
-double charge = mwfn.getCharge(); # Total nuclear charges minus the number of electrons.
+double n_alpha = mwfn.getNumElec(1) // The number of alpha electrons.
+double n_beta = mwfn.getNumElec(2) // The number of beta electrons.
+double charge = mwfn.getCharge(); // Total nuclear charges minus the number of electrons.
 ```
 ```python
+# Python
 n = job_mwfn.getNumElec() # or mwfn.getNumElec(0)
 n_alpha = job_mwfn.getNumElec(1)
 n_beta = job_mwfn.getNumElec(2)
@@ -116,27 +124,30 @@ Note that the returned values are all floating-point numbers for the general cas
 
 + Getting and setting the occupation numbers.
 ```c++
-int homo = std::round(job_mwfn.getNumElec(0) / 2) - 1; # The indices of the HOMO and LUMO.
+// C++
+int homo = std::round(job_mwfn.getNumElec(0) / 2) - 1; // The indices of the HOMO and LUMO.
 int lumo = std::round(job_mwfn.getNumElec(0) / 2);
-Eigen::VectorXd N = job_mwfn.getOccupation(0); # 0 for spin-restricted, 1 and 2 for alpha and beta in spin-unrestricted.
+Eigen::VectorXd N = job_mwfn.getOccupation(0); // 0 for spin-restricted, 1 and 2 for alpha and beta in spin-unrestricted.
 N(homo) = 0;
-N(lumo) = 2; # Swapping the occupation numbers of the HOMO and LUMO.
+N(lumo) = 2; // Swapping the occupation numbers of the HOMO and LUMO.
 mwfn.setOccupation(N, 0);
 ```
 
 + Getting and setting the orbital energies.
-```
+```c++
+// C++
 Eigen::VectorXd E = job_mwfn.getEnergy(0);
 E.setZero();
-job_mwfn.setEnergy(E, 0);  # Setting the orbital energies to zeros.
+job_mwfn.setEnergy(E, 0); // Setting the orbital energies to zeros.
 ```
 
 + Getting and setting the coefficient matrix.
-```
+```c++
+// C++
 Eigen::MatrixXd C = job_mwfn.getCoefficientMatrix(0);
-Eigen::VectorXd C_0 = C.col(0); # The coefficient vector of the first orbital.
-Eigen::VectorXd C_1 = C.col(1); # The coefficient vector of the second orbital.
-C.col(0) = (C_0 + C_1) / 1.414213562; # Mixing the first two orbitals.
+Eigen::VectorXd C_0 = C.col(0); // The coefficient vector of the first orbital.
+Eigen::VectorXd C_1 = C.col(1); // The coefficient vector of the second orbital.
+C.col(0) = (C_0 + C_1) / 1.414213562; // Mixing the first two orbitals.
 C.col(1) = (C_0 - C_1) / 1.414213562;
 job_mwfn.setCoefficientMatrix(C, 0);
 ```
