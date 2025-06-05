@@ -239,6 +239,9 @@ Mwfn::Mwfn(std::string mwfn_filename){
 				const int total = Shells.size();
 				__Read_Array_Head__
 					Shells[k].Type = std::stoi(word);
+					if ( Shells[k].Type == -1 ){
+						throw std::runtime_error("Currently the spherical P orbital (Type = -1, in the order of py, pz, px) is not allowed!");
+					}
 				__Read_Array_Tail__
 			}else if ( word.compare("centers") == 0 ){
 				const int total = Shells.size();

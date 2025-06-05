@@ -8,6 +8,7 @@
 #include <fstream>
 #include <map>
 #include <regex>
+#include <numeric>
 
 #include "NecessaryHeaders.h"
 #include "Macro.h"
@@ -143,6 +144,41 @@ EigenMatrix Mwfn::getEnergyDensity(int spin){
 	return C * N * E * C.transpose();
 }
 
+std::vector<int> Mwfn::Shell2Atom(){
+	std::vector<int> shell2atom = {};
+	shell2atom.reserve(this->getNumShells());
+	for ( int icenter = 0; icenter < this->getNumCenters(); icenter++ ){
+		for ( int jshell = 0; jshell < this->Centers[icenter].getNumShells(); jshell++ ){
+			shell2atom.push_back(icenter);
+		}
+	}
+	return shell2atom;
+}
+
+std::vector<int> Mwfn::Atom2Shell(){
+	std::vector<int> atom2shell = {};
+	atom2shell.reserve(this->getNumCenters());
+	int ishell = 0;
+	for ( MwfnCenter& center : this->Centers ){
+		atom2shell.push_back(ishell);
+		ishell += center.getNumShells();
+	}
+	return atom2shell;
+}
+
+std::vector<std::vector<int>> Mwfn::Atom2ShellList(){
+	std::vector<std::vector<int>> shell_indices_by_center = {};
+	std::vector<int> atom2shell = this->Atom2Shell();
+	for ( int iatom = 0; iatom < this->getNumCenters(); iatom++ ){
+		int shell_head = atom2shell[iatom];
+		int shell_length = this->Centers[iatom].getNumShells();
+		std::vector<int> this_center(shell_length);
+		std::iota(this_center.begin(), this_center.end(), shell_head);
+		shell_indices_by_center.push_back(this_center);
+	}
+	return shell_indices_by_center;
+}
+
 std::vector<int> Mwfn::Basis2Atom(){
 	std::vector<int> bf2atom = {}; bf2atom.reserve(this->getNumBasis());
 	for ( int icenter = 0; icenter < this->getNumCenters(); icenter++ ){
@@ -161,6 +197,64 @@ std::vector<int> Mwfn::Atom2Basis(){
 		ibasis += center.getNumBasis();
 	}
 	return atom2bf;
+}
+
+std::vector<std::vector<int>> Mwfn::Atom2BasisList(){
+	std::vector<std::vector<int>> basis_indices_by_center = {};
+	std::vector<int> atom2bf = this->Atom2Basis();
+	for ( int iatom = 0; iatom < this->getNumCenters(); iatom++ ){
+		int basis_head = atom2bf[iatom];
+		int basis_length = this->Centers[iatom].getNumBasis();
+		std::vector<int> this_center(basis_length);
+		std::iota(this_center.begin(), this_center.end(), basis_head);
+		basis_indices_by_center.push_back(this_center);
+	}
+	return basis_indices_by_center;
+}
+
+std::vector<int> Mwfn::Basis2Shell(){
+	std::vector<int> bf2shell = {}; bf2shell.reserve(this->getNumBasis());
+	for ( int icenter = 0, jshell = 0; icenter < this->getNumCenters(); icenter++ ){
+		for ( int _ = 0; _ < this->Centers[icenter].getNumShells(); _++, jshell++ ){
+			for ( int kbasis = 0; kbasis < this->Centers[icenter].Shells[_].getSize(); kbasis++ ){
+				bf2shell.push_back(jshell);
+			}
+		}
+	}
+	return bf2shell;
+}
+
+std::vector<int> Mwfn::Shell2Basis(){
+	std::vector<int> shell2bf = {}; shell2bf.reserve(this->getNumShells());
+	int ibasis = 0;
+	for ( MwfnCenter& center : this->Centers ) for ( MwfnShell& shell : center.Shells ){
+		shell2bf.push_back(ibasis);
+		ibasis += shell.getSize();
+	}
+	return shell2bf;
+}
+
+MwfnShell& Mwfn::getShell(int ishell){
+	if ( ishell < 0 ) throw std::runtime_error("The shell index must be >= 0!");
+	if ( ishell >= this->getNumShells() ) throw std::runtime_error("The shell index exceeds the total number!");
+	for ( MwfnCenter& center : this->Centers ) for ( MwfnShell& shell : center.Shells ){
+		if ( ishell == 0 ) return shell;
+		else ishell--;
+	}
+	throw std::runtime_error("You shouldn't be here!");
+}
+
+std::vector<std::vector<int>> Mwfn::Shell2BasisList(){
+	std::vector<std::vector<int>> basis_indices_by_shell = {};
+	std::vector<int> shell2bf = this->Shell2Basis();
+	for ( int ishell = 0; ishell < this->getNumShells(); ishell++ ){
+		int basis_head = shell2bf[ishell];
+		int basis_length = this->getShell(ishell).getSize();
+		std::vector<int> this_shell(basis_length);
+		std::iota(this_shell.begin(), this_shell.end(), basis_head);
+		basis_indices_by_shell.push_back(this_shell);
+	}
+	return basis_indices_by_shell;
 }
 
 std::vector<int> Mwfn::getSpins(){

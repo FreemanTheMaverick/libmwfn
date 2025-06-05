@@ -34,8 +34,18 @@ class Mwfn{ public:
 	EigenMatrix getFock(int spin = 0);
 	EigenMatrix getDensity(int spin = 0);
 	EigenMatrix getEnergyDensity(int spin = 0);
+
+	std::vector<int> Shell2Atom();
+	std::vector<int> Atom2Shell();
+	std::vector<std::vector<int>> Atom2ShellList();
 	std::vector<int> Basis2Atom();
 	std::vector<int> Atom2Basis();
+	std::vector<std::vector<int>> Atom2BasisList();
+	std::vector<int> Basis2Shell();
+	std::vector<int> Shell2Basis();
+	std::vector<std::vector<int>> Shell2BasisList();
+	
+	MwfnShell& getShell(int ishell);
 	std::vector<int> getSpins();
 	void Orthogonalize(std::string scheme);
 
