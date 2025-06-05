@@ -65,7 +65,7 @@ Title Card Required
 
 ### Converting wavefunction file
 The resultant wavefunction is stored in `job.chk`, an `chk` format file which is not supported by **libmwfn**.
-We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format with `Multiwfn`.
+We need to transform `job.chk` to `fchk` with `formchk` and then to `mwfn` format with [Multiwfn](http://sobereva.com/multiwfn).
 
 ```
 $ # Shell
