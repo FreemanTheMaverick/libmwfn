@@ -152,6 +152,18 @@ C.col(1) = (C_0 - C_1) / 1.414213562;
 job_mwfn.setCoefficientMatrix(C, 0);
 ```
 
++ Make a (deep) copy of a `Mwfn` instance.
+```c++
+// C++
+std::unique_ptr<Mwfn> another_mwfn = job_mwfn.Clone();
+std::cout << another_mwfn->getNumElec() << std::endl; // The copy is a pointer.
+```
+```python
+# Python
+another_mwfn = job_mwfn.Clone()
+print(another_mwfn.getNumElec()) # No need to worry about the pointer thing.
+```
+
 + Check the header `libmwfn.h` for more functions.
 
 ## Caution

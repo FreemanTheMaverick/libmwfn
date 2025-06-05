@@ -11,7 +11,7 @@ class Mwfn{ public:
 	std::vector<MwfnOrbital> Orbitals = {};
 
 	// Field 5
-	EigenMatrix Overlap; // Overlap matrix among basis functions.
+	EigenMatrix Overlap; // Overlap matrix among (normalized) basis functions.
 
 	double getCharge();
 	double getNumElec(int spin = 0);
@@ -37,14 +37,14 @@ class Mwfn{ public:
 
 	std::vector<int> Shell2Atom(); // The i^th element is the index of the atom which the i^th shell originates from.
 	std::vector<int> Atom2Shell(); // The i^th element is the index of the first shell that orignates from the i^th atom.
-	std::vector<std::vector<int>> Atom2ShellList(); // The i^th list consists of the indeces of the shells that originates from the i^th atom.
-	std::vector<int> Basis2Atom(); // Similar to above.
-	std::vector<int> Atom2Basis();
-	std::vector<std::vector<int>> Atom2BasisList();
-	std::vector<int> Basis2Shell();
-	std::vector<int> Shell2Basis();
-	std::vector<std::vector<int>> Shell2BasisList();
-	
+	std::vector<std::vector<int>> Atom2ShellList(); // The i^th list consists of the indeces of the shells that originate from the i^th atom.
+	std::vector<int> Basis2Atom(); // The i^th element is the index of the atom which the i^th basis function originates from.
+	std::vector<int> Atom2Basis(); // The i^th element is the index of the first basis function that orignates from the i^th atom.
+	std::vector<std::vector<int>> Atom2BasisList(); // The i^th list consists of the indeces of the basis functions that originate from the i^th atom.
+	std::vector<int> Basis2Shell(); // The i^th element is the index of the shell which the i^th basis function belongs to.
+	std::vector<int> Shell2Basis(); // The i^th element is the index of the first basis function that belongs to the i^th shell.
+	std::vector<std::vector<int>> Shell2BasisList(); // The i^th list consists of the indeces of the basis functions that belong to the i^th shell.
+
 	MwfnShell& getShell(int ishell); // The reference to the i^th shell.
 	std::vector<int> getSpins(); // A list of spin indeces of the current wavefunction type. [0] for Wfntype = 0; [1, 2] for Wfntype = 1.
 	void Orthogonalize(std::string scheme); // Orthogonalize the orbitals in the scheme of "GramSchmidt" or "Lowdin".
