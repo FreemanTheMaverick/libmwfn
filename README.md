@@ -33,7 +33,7 @@ $ gcc test.cpp -I$(LIBMWFN)/include/ -L$(LIBMWFN)/lib/ -lmwfn # or -l:libmwfn.a
 ### Python
 * Install via pip.
 ```
-pip install libmwfn
+$ pip install libmwfn
 ```
 * Tryout. (Reading in an existent file `test.mwfn` and exporting its information to another `test_new.mwfn`)
 ```
