@@ -109,8 +109,8 @@ job_mwfn.Export("job_new.mwfn")
 // C++
 int spin = 0; // 0 - default spin (depending on wavefunction types and functions); 1 - alpha; 2 - beta.
 double n = job_mwfn.getNumElec(spin); // spin is optional. Default is 0, the total number of electrons of two spin types.
-double n_alpha = mwfn.getNumElec(1) // The number of alpha electrons.
-double n_beta = mwfn.getNumElec(2) // The number of beta electrons.
+double n_alpha = mwfn.getNumElec(1); // The number of alpha electrons.
+double n_beta = mwfn.getNumElec(2); // The number of beta electrons.
 double charge = mwfn.getCharge(); // Total nuclear charges minus the number of electrons.
 ```
 ```python
