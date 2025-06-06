@@ -15,7 +15,7 @@ The motive of this library is my need for a tool to deal with wavefunction files
 * GNU `make` and `Eigen3` for C++
 * `setuptools` and `pybind11` for Python
 ### C++
-* Obtain the source code via `git clone`ing the repository or `wget`ing the newest release.
+* Obtain the source code via `git clone`ing the repository or `wget`ing the latest release.
 * Specify the C++ compiler and the `Eigen3` directory in `makefile`.
 * Build the library with `make -j[N]` and you will find the newly created directories `include/` and `lib/`.
 * Tryout. (Reading in an existent file `test.mwfn` and exporting its information to another `test_new.mwfn`)
@@ -44,7 +44,7 @@ $ python
 ```
 
 ## Usage
-Here is a typical procedure to deal with wavefunctions in `Orbaplaw`.
+Here is a typical procedure to deal with wavefunctions in **libmwfn**.
 
 ### *Ab initio* quantum chemistry computation
 A wavefunction file given by an *ab initio* calculation is needed.
@@ -109,13 +109,13 @@ job_mwfn.Export("job_new.mwfn")
 // C++
 int spin = 0; // 0 - default spin (depending on wavefunction types and functions); 1 - alpha; 2 - beta.
 double n = job_mwfn.getNumElec(spin); // spin is optional. Default is 0, the total number of electrons of two spin types.
-double n_alpha = mwfn.getNumElec(1); // The number of alpha electrons.
-double n_beta = mwfn.getNumElec(2); // The number of beta electrons.
-double charge = mwfn.getCharge(); // Total nuclear charges minus the number of electrons.
+double n_alpha = job_mwfn.getNumElec(1); // The number of alpha electrons.
+double n_beta = job_mwfn.getNumElec(2); // The number of beta electrons.
+double charge = job_mwfn.getCharge(); // Total nuclear charges minus the number of electrons.
 ```
 ```python
 # Python
-n = job_mwfn.getNumElec() # or mwfn.getNumElec(0)
+n = job_mwfn.getNumElec() # or job_mwfn.getNumElec(0)
 n_alpha = job_mwfn.getNumElec(1)
 n_beta = job_mwfn.getNumElec(2)
 charge = job_mwfn.getCharge()
@@ -130,7 +130,7 @@ int lumo = std::round(job_mwfn.getNumElec(0) / 2);
 Eigen::VectorXd N = job_mwfn.getOccupation(0); // 0 for spin-restricted, 1 and 2 for alpha and beta in spin-unrestricted.
 N(homo) = 0;
 N(lumo) = 2; // Swapping the occupation numbers of the HOMO and LUMO.
-mwfn.setOccupation(N, 0);
+job_mwfn.setOccupation(N, 0);
 ```
 
 + Getting and setting the orbital energies.
