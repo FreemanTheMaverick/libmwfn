@@ -35,7 +35,7 @@
 		}\
 	}
 
-double NuclearRepulsion0(std::vector<std::pair<double, std::array<double, 3>>> libint2charges){
+static double NuclearRepulsion0(std::vector<std::pair<double, std::array<double, 3>>> libint2charges){
 	const int natoms = libint2charges.size();
 	double nuclearrepulsion=0;
 	__Loop_Over_Atom_Pairs__
@@ -45,9 +45,9 @@ double NuclearRepulsion0(std::vector<std::pair<double, std::array<double, 3>>> l
 	return nuclearrepulsion;
 }
 
-EigenMatrix NuclearRepulsion1(std::vector<std::pair<double, std::array<double, 3>>> libint2charges){
+static Eigen::MatrixXd NuclearRepulsion1(std::vector<std::pair<double, std::array<double, 3>>> libint2charges){
 	const int natoms = libint2charges.size();
-	EigenMatrix G=EigenZero(natoms,3);
+	Eigen::MatrixXd G=Eigen::MatrixXd::Zero(natoms,3);
 	__Loop_Over_Atom_Pairs__
 		if (jatom!=iatom){
 			G(iatom,0)-=Zij/dij/dij/dij*xij;
@@ -58,9 +58,9 @@ EigenMatrix NuclearRepulsion1(std::vector<std::pair<double, std::array<double, 3
 	return G;
 }
 
-EigenMatrix NuclearRepulsion2(std::vector<std::pair<double, std::array<double, 3>>> libint2charges){
+static Eigen::MatrixXd NuclearRepulsion2(std::vector<std::pair<double, std::array<double, 3>>> libint2charges){
 	const int natoms = libint2charges.size();
-	EigenMatrix H=EigenZero(natoms*3,natoms*3);
+	Eigen::MatrixXd H=Eigen::MatrixXd::Zero(natoms*3,natoms*3);
 	__Loop_Over_Atom_Pairs__
 		if (jatom==iatom) for (int katom=0;katom<natoms;katom++){
 			if (iatom==katom) continue;
@@ -94,7 +94,7 @@ EigenMatrix NuclearRepulsion2(std::vector<std::pair<double, std::array<double, 3
 	return H;
 }
 
-std::tuple<double, EigenMatrix, EigenMatrix> Mwfn::NuclearRepulsion(){
+std::tuple<double, Eigen::MatrixXd, Eigen::MatrixXd> Mwfn::NuclearRepulsion(){
 	std::vector<std::pair<double, std::array<double, 3>>> libint2charges = {}; // Making point charges.
 	for ( MwfnCenter& center : this->Centers )
 		libint2charges.push_back(std::make_pair(
@@ -107,7 +107,7 @@ std::tuple<double, EigenMatrix, EigenMatrix> Mwfn::NuclearRepulsion(){
 		));
 
 	double E_nuc = NuclearRepulsion0(libint2charges);
-	EigenMatrix G_nuc = NuclearRepulsion1(libint2charges);
-	EigenMatrix H_nuc = NuclearRepulsion2(libint2charges);
+	Eigen::MatrixXd G_nuc = NuclearRepulsion1(libint2charges);
+	Eigen::MatrixXd H_nuc = NuclearRepulsion2(libint2charges);
 	return std::make_tuple(E_nuc, G_nuc, H_nuc);
 }

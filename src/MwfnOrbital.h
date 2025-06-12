@@ -3,5 +3,5 @@ class MwfnOrbital{ public:
 	double Energy = 0;
 	double Occ = 0;
 	std::string Sym = "A";
-	EigenVector Coeff;
+	Eigen::VectorXd Coeff;
 };

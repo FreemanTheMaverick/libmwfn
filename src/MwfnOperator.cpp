@@ -81,66 +81,66 @@ int Mwfn::getNumPrimShells(){
 	return nprimshells;
 }
 
-EigenMatrix Mwfn::getCoefficientMatrix(int spin){
+Eigen::MatrixXd Mwfn::getCoefficientMatrix(int spin){
 	__Check_Spin_Type_Shift__
-	EigenMatrix matrix = EigenZero(this->getNumBasis(), this->getNumIndBasis());
+	Eigen::MatrixXd matrix = Eigen::MatrixXd::Zero(this->getNumBasis(), this->getNumIndBasis());
 	for ( int jcol = 0; jcol < this->getNumIndBasis(); jcol++ )
 		matrix.col(jcol) = this->Orbitals[jcol + shift].Coeff;
 	return matrix;
 }
 
-void Mwfn::setCoefficientMatrix(EigenMatrix matrix, int spin){
+void Mwfn::setCoefficientMatrix(Eigen::MatrixXd matrix, int spin){
 	__Check_Spin_Type_Shift__
 	for ( int jcol = 0; jcol < this->getNumIndBasis(); jcol++ )
 		this->Orbitals[jcol + shift].Coeff = matrix.col(jcol);
 }
 
-EigenVector Mwfn::getEnergy(int spin){
+Eigen::VectorXd Mwfn::getEnergy(int spin){
 	__Check_Spin_Type_Shift__
-	EigenVector energies(this->getNumIndBasis());
+	Eigen::VectorXd energies(this->getNumIndBasis());
 	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ )
 		energies(iorbital) = this->Orbitals[iorbital + shift].Energy;
 	return energies;
 }
 
-void Mwfn::setEnergy(EigenVector energies, int spin){
+void Mwfn::setEnergy(Eigen::VectorXd energies, int spin){
 	__Check_Spin_Type_Shift__
 	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ )
 		this->Orbitals[iorbital + shift].Energy = energies(iorbital);
 }
 
-EigenVector Mwfn::getOccupation(int spin){
+Eigen::VectorXd Mwfn::getOccupation(int spin){
 	__Check_Spin_Type_Shift__
-	EigenVector occupancies(this->getNumIndBasis());
+	Eigen::VectorXd occupancies(this->getNumIndBasis());
 	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ )
 		occupancies(iorbital) = this->Orbitals[iorbital + shift].Occ;
 	return occupancies;
 }
 
-void Mwfn::setOccupation(EigenVector occupancies, int spin){
+void Mwfn::setOccupation(Eigen::VectorXd occupancies, int spin){
 	__Check_Spin_Type_Shift__
 	for ( int iorbital = 0; iorbital < std::min((int)occupancies.size(), this->getNumIndBasis()); iorbital++ )
 		this->Orbitals[iorbital + shift].Occ = occupancies(iorbital);
 }
 
-EigenMatrix Mwfn::getFock(int spin){
-	const EigenMatrix S = this->Overlap;
+Eigen::MatrixXd Mwfn::getFock(int spin){
+	const Eigen::MatrixXd S = this->Overlap;
 	if ( S.size() == 0 ) throw std::runtime_error("Overlap matrix is missing!");
-	const EigenDiagonal E = this->getEnergy(spin).asDiagonal();
-	const EigenMatrix C = this->getCoefficientMatrix(spin);
+	const Eigen::DiagonalMatrix<double,-1,-1> E = this->getEnergy(spin).asDiagonal();
+	const Eigen::MatrixXd C = this->getCoefficientMatrix(spin);
 	return S * C * E * C.transpose() * S;
 }
 
-EigenMatrix Mwfn::getDensity(int spin){
-	const EigenDiagonal N = this->getOccupation(spin).asDiagonal();
-	const EigenMatrix C = this->getCoefficientMatrix(spin);
+Eigen::MatrixXd Mwfn::getDensity(int spin){
+	const Eigen::DiagonalMatrix<double,-1,-1> N = this->getOccupation(spin).asDiagonal();
+	const Eigen::MatrixXd C = this->getCoefficientMatrix(spin);
 	return C * N * C.transpose();
 }
 
-EigenMatrix Mwfn::getEnergyDensity(int spin){
-	const EigenDiagonal N = this->getOccupation(spin).asDiagonal();
-	const EigenDiagonal E = this->getEnergy(spin).asDiagonal();
-	const EigenMatrix C = this->getCoefficientMatrix(spin);
+Eigen::MatrixXd Mwfn::getEnergyDensity(int spin){
+	const Eigen::DiagonalMatrix<double,-1,-1> N = this->getOccupation(spin).asDiagonal();
+	const Eigen::DiagonalMatrix<double,-1,-1> E = this->getEnergy(spin).asDiagonal();
+	const Eigen::MatrixXd C = this->getCoefficientMatrix(spin);
 	return C * N * E * C.transpose();
 }
 
@@ -265,30 +265,30 @@ std::vector<int> Mwfn::getSpins(){
 	}
 }
 
-static EigenMatrix GramSchmidt(EigenMatrix C, EigenMatrix S){
-	Eigen::SelfAdjointEigenSolver<EigenMatrix> es(S);
-	const EigenMatrix Ssqrt = es.operatorSqrt();
-	const EigenMatrix Sinvsqrt = es.operatorInverseSqrt();
-	const EigenMatrix Cprime = Ssqrt * C;
-	Eigen::HouseholderQR<EigenMatrix> qr(Cprime);
-	const EigenMatrix Cprime_new = qr.householderQ();
-	const EigenMatrix C_new = Sinvsqrt * Cprime_new;
+static Eigen::MatrixXd GramSchmidt(Eigen::MatrixXd C, Eigen::MatrixXd S){
+	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(S);
+	const Eigen::MatrixXd Ssqrt = es.operatorSqrt();
+	const Eigen::MatrixXd Sinvsqrt = es.operatorInverseSqrt();
+	const Eigen::MatrixXd Cprime = Ssqrt * C;
+	Eigen::HouseholderQR<Eigen::MatrixXd> qr(Cprime);
+	const Eigen::MatrixXd Cprime_new = qr.householderQ();
+	const Eigen::MatrixXd C_new = Sinvsqrt * Cprime_new;
 	return C_new;
 }
 
-static EigenMatrix Lowdin(EigenMatrix C, EigenMatrix S){
-	Eigen::SelfAdjointEigenSolver<EigenMatrix> es(C.transpose() * S * C);
-	const EigenMatrix X = es.operatorInverseSqrt();
-	const EigenMatrix C_new = C * X;
+static Eigen::MatrixXd Lowdin(Eigen::MatrixXd C, Eigen::MatrixXd S){
+	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(C.transpose() * S * C);
+	const Eigen::MatrixXd X = es.operatorInverseSqrt();
+	const Eigen::MatrixXd C_new = C * X;
 	return C_new;
 }
 
 void Mwfn::Orthogonalize(std::string scheme){
-	const EigenMatrix S = this->Overlap;
+	const Eigen::MatrixXd S = this->Overlap;
 	if ( S.size() == 0 ) throw std::runtime_error("Overlap matrix is missing!");
 	std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::toupper);
 	for  ( int spin : this->getSpins() ){
-		EigenMatrix C = this->getCoefficientMatrix(spin);
+		Eigen::MatrixXd C = this->getCoefficientMatrix(spin);
 		if ( scheme == "GRAMSCHMIDT" || scheme == "GS" || scheme == "GRAM" ) C = GramSchmidt(C, S);
 		else if ( scheme == "LOWDIN" || scheme == "SYMMETRIC" || scheme == "SYM" ) C = Lowdin(C, S);
 		this->setCoefficientMatrix(C, spin);

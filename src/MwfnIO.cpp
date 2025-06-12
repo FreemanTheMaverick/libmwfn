@@ -71,26 +71,26 @@
 		}\
 	__Read_Array_Tail__
 
-EigenMatrix MatrixTransform(std::vector<MwfnCenter> centers){ // Chinium orders basis functions in the order like P-1, P0, P+1 and D-2, D-1, D0, D+1, D+2, while .mwfn does like Px, Py, Pz and D0, D+1, D-1, D+2, D-2. This function is used to transform matrices between two forms. 
-	std::map<int, EigenMatrix> SPDFGHI; // 0 1 2 3 4 5 6 -6 -5 -4 -3 -2 -1
-	SPDFGHI[0] = EigenOne(1, 1);
-	SPDFGHI[1] = EigenOne(3, 3);
-	SPDFGHI[2] = EigenOne(6, 6);
-	SPDFGHI[3] = EigenOne(10, 10);
-	SPDFGHI[4] = EigenOne(15, 15);
-	SPDFGHI[5] = EigenOne(21, 21);
-	SPDFGHI[6] = EigenOne(28, 28);
-	SPDFGHI[-1] = EigenZero(3, 3); SPDFGHI[-1] <<
+Eigen::MatrixXd MatrixTransform(std::vector<MwfnCenter> centers){ // Chinium orders basis functions in the order like P-1, P0, P+1 and D-2, D-1, D0, D+1, D+2, while .mwfn does like Px, Py, Pz and D0, D+1, D-1, D+2, D-2. This function is used to transform matrices between two forms. 
+	std::map<int, Eigen::MatrixXd> SPDFGHI; // 0 1 2 3 4 5 6 -6 -5 -4 -3 -2 -1
+	SPDFGHI[0] = Eigen::MatrixXd::Identity(1, 1);
+	SPDFGHI[1] = Eigen::MatrixXd::Identity(3, 3);
+	SPDFGHI[2] = Eigen::MatrixXd::Identity(6, 6);
+	SPDFGHI[3] = Eigen::MatrixXd::Identity(10, 10);
+	SPDFGHI[4] = Eigen::MatrixXd::Identity(15, 15);
+	SPDFGHI[5] = Eigen::MatrixXd::Identity(21, 21);
+	SPDFGHI[6] = Eigen::MatrixXd::Identity(28, 28);
+	SPDFGHI[-1] = Eigen::MatrixXd::Zero(3, 3); SPDFGHI[-1] <<
 		0, 1, 0,
 		0, 0, 1,
 		1, 0, 0;
-	SPDFGHI[-2] = EigenZero(5, 5); SPDFGHI[-2] <<
+	SPDFGHI[-2] = Eigen::MatrixXd::Zero(5, 5); SPDFGHI[-2] <<
 		0, 0, 1, 0, 0,
 		0, 0, 0, 1, 0,
 		0, 1, 0, 0, 0,
 		0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0;
-	SPDFGHI[-3] = EigenZero(7, 7); SPDFGHI[-3] <<
+	SPDFGHI[-3] = Eigen::MatrixXd::Zero(7, 7); SPDFGHI[-3] <<
 		0, 0, 0, 1, 0, 0, 0,
 		0, 0, 0, 0, 1, 0, 0,
 		0, 0, 1, 0, 0, 0, 0,
@@ -98,7 +98,7 @@ EigenMatrix MatrixTransform(std::vector<MwfnCenter> centers){ // Chinium orders 
 		0, 1, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0;
-	SPDFGHI[-4] = EigenZero(9, 9); SPDFGHI[-4] <<
+	SPDFGHI[-4] = Eigen::MatrixXd::Zero(9, 9); SPDFGHI[-4] <<
 		0, 0, 0, 0, 1, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 1, 0, 0, 0,
 		0, 0, 0, 1, 0, 0, 0, 0, 0,
@@ -108,7 +108,7 @@ EigenMatrix MatrixTransform(std::vector<MwfnCenter> centers){ // Chinium orders 
 		0, 1, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0;
-	SPDFGHI[-5] = EigenZero(11, 11); SPDFGHI[-5] <<
+	SPDFGHI[-5] = Eigen::MatrixXd::Zero(11, 11); SPDFGHI[-5] <<
 		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
 		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
@@ -120,7 +120,7 @@ EigenMatrix MatrixTransform(std::vector<MwfnCenter> centers){ // Chinium orders 
 		0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-	SPDFGHI[-6] = EigenZero(13, 13); SPDFGHI[-6] <<
+	SPDFGHI[-6] = Eigen::MatrixXd::Zero(13, 13); SPDFGHI[-6] <<
 		0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
@@ -136,7 +136,7 @@ EigenMatrix MatrixTransform(std::vector<MwfnCenter> centers){ // Chinium orders 
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
 	int nbasis = 0;
 	for ( MwfnCenter& center : centers ) nbasis += center.getNumBasis();
-	EigenMatrix transform = EigenZero(nbasis, nbasis);
+	Eigen::MatrixXd transform = Eigen::MatrixXd::Zero(nbasis, nbasis);
 	int jbasis = 0;
 	for ( MwfnCenter& center : centers ) for ( MwfnShell& shell : center.Shells ){
 		int l = shell.Type;
@@ -174,7 +174,7 @@ Mwfn::Mwfn(std::string mwfn_filename){
 	int nindbasis = -114;
 	std::vector<MwfnShell> Shells = {};
 	std::vector<int> Shell_centers={};
-	EigenMatrix mwfntransform;
+	Eigen::MatrixXd mwfntransform;
 	while ( std::getline(file, line) ){
 		std::stringstream ss(line);
 		ss >> word;
@@ -312,7 +312,7 @@ Mwfn::Mwfn(std::string mwfn_filename){
 			ss >> word; // "lower="
 			ss >> word; // lower
 			const int lower = std::stoi(word);
-			this->Total_density_matrix = EigenZero(nrows, ncols);
+			this->Total_density_matrix = Eigen::MatrixXd::Zero(nrows, ncols);
 			__Load_Matrix__(this->Total_density_matrix)
 			this->Total_density_matrix = mwfntransform.transpose() * this->Total_density_matrix * mwfntransform;
 			continue;
@@ -333,12 +333,12 @@ Mwfn::Mwfn(std::string mwfn_filename){
 		}
 	}
 	for ( int spin : ( this->Wfntype == 0 ? std::vector<int>{0} : std::vector<int>{1, 2} ) ){
-		const EigenMatrix tmp_mat = mwfntransform.transpose() * this->getCoefficientMatrix(spin);
+		const Eigen::MatrixXd tmp_mat = mwfntransform.transpose() * this->getCoefficientMatrix(spin);
 		this->setCoefficientMatrix(tmp_mat, spin);
 	}
 }
 
-void PrintMatrix(std::FILE * file, EigenMatrix matrix, bool lower){
+void PrintMatrix(std::FILE * file, Eigen::MatrixXd matrix, bool lower){
 	for ( int i = 0; i < matrix.rows(); i++ ){
 		for ( int j = 0; j < ( lower ? i+1 : matrix.cols() ); j++ )
 			std::fprintf(file, " %E", matrix(i, j));
@@ -424,7 +424,7 @@ void Mwfn::Export(std::string mwfn_filename){
 
 	// Field 4
 	std::fprintf(file, "\n\n# Orbitals\n");
-	EigenMatrix mwfntransform = MatrixTransform(this->Centers);
+	Eigen::MatrixXd mwfntransform = MatrixTransform(this->Centers);
 	int iorbital = 0;
 	for ( MwfnOrbital& orbital : this->Orbitals ){
 		std::fprintf(file, "Index= %9d\n", iorbital + 1);
@@ -433,7 +433,7 @@ void Mwfn::Export(std::string mwfn_filename){
 		std::fprintf(file, "Occ= %E\n", orbital.Occ);
 		std::fprintf(file, "Sym= %s\n", orbital.Sym.c_str());
 		std::fprintf(file, "$Coeff\n");
-		const EigenVector c = mwfntransform * orbital.Coeff;
+		const Eigen::VectorXd c = mwfntransform * orbital.Coeff;
 		for ( int j = 0; j < this->getNumBasis(); j++ ){
 			std::fprintf(file, " %.10E", c(j));
 		}

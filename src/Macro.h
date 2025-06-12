@@ -1,10 +1,3 @@
-#define EigenArray Eigen::ArrayXd
-#define EigenVector Eigen::VectorXd
-#define EigenDiagonal Eigen::DiagonalMatrix<double,-1,-1>
-#define EigenMatrix Eigen::MatrixXd
-#define EigenZero Eigen::MatrixXd::Zero
-#define EigenOne Eigen::MatrixXd::Identity
-
 #define __Name_2_Z__\
     std::map<std::string, double> Name2Z = {\
 	        {"H" ,  1}, {"HE",  2}, {"LI",  3}, {"BE",  4}, {"B" ,  5},\
@@ -43,7 +36,7 @@
 			"Lu", "Hf", "Ta", "W" , "Re", "Os", "Ir", "Pt", "Au", "Hg",\
 			"Tl", "Pb", "Bi", "Po", "At", "Rn", "Fr", "Ra", "Ac", "Th",\
 			"Pa", "U" , "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm",\
-			"Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds",\
+			"Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds"\
     };
 
 #define __angstrom2bohr__ 1.8897259886

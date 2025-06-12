@@ -11,7 +11,7 @@ class Mwfn{ public:
 	std::vector<MwfnOrbital> Orbitals = {};
 
 	// Field 5
-	EigenMatrix Overlap; // Overlap matrix among (normalized) basis functions.
+	Eigen::MatrixXd Overlap; // Overlap matrix among (normalized) basis functions.
 
 	double getCharge();
 	double getNumElec(int spin = 0);
@@ -24,16 +24,16 @@ class Mwfn{ public:
 	int getNumShells(); // Number of shells.
 	int getNumPrimShells();
 
-	EigenMatrix getCoefficientMatrix(int spin = 0);
-	void setCoefficientMatrix(EigenMatrix matrix, int spin = 0);
+	Eigen::MatrixXd getCoefficientMatrix(int spin = 0);
+	void setCoefficientMatrix(Eigen::MatrixXd matrix, int spin = 0);
 
-	EigenVector getEnergy(int spin = 0);
-	void setEnergy(EigenVector energies, int spin = 0);
-	EigenVector getOccupation(int spin = 0);
-	void setOccupation(EigenVector occupancies, int spin = 0);
-	EigenMatrix getFock(int spin = 0); // Fock matrix.
-	EigenMatrix getDensity(int spin = 0); // Density matrix.
-	EigenMatrix getEnergyDensity(int spin = 0); // Energy-weighted density matrix.
+	Eigen::VectorXd getEnergy(int spin = 0);
+	void setEnergy(Eigen::VectorXd energies, int spin = 0);
+	Eigen::VectorXd getOccupation(int spin = 0);
+	void setOccupation(Eigen::VectorXd occupancies, int spin = 0);
+	Eigen::MatrixXd getFock(int spin = 0); // Fock matrix.
+	Eigen::MatrixXd getDensity(int spin = 0); // Density matrix.
+	Eigen::MatrixXd getEnergyDensity(int spin = 0); // Energy-weighted density matrix.
 
 	std::vector<int> Shell2Atom(); // The i^th element is the index of the atom which the i^th shell originates from.
 	std::vector<int> Atom2Shell(); // The i^th element is the index of the first shell that orignates from the i^th atom.
@@ -57,5 +57,5 @@ class Mwfn{ public:
 	void PrintOrbitals();
 	void setBasis(std::string basis_filename); // Advanced.
 	void setCenters(std::vector<std::vector<double>> atoms); // Advanced.
-	std::tuple<double, EigenMatrix, EigenMatrix> NuclearRepulsion(); // Nuclear repulsion energy and its first two nuclear derivatives.
+	std::tuple<double, Eigen::MatrixXd, Eigen::MatrixXd> NuclearRepulsion(); // Nuclear repulsion energy and its first two nuclear derivatives.
 };

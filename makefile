@@ -41,8 +41,6 @@ all: $(OBJECTS) | $(INCDIR) $(LIBDIR)
 	cat src/MwfnCenter.h      >> $(INCDIR)/libmwfn.h
 	cat src/MwfnOrbital.h     >> $(INCDIR)/libmwfn.h
 	cat src/Mwfn.h            >> $(INCDIR)/libmwfn.h
-	sed -i "s/EigenMatrix/Eigen::MatrixXd/g" $(INCDIR)/libmwfn.h
-	sed -i "s/EigenVector/Eigen::VectorXd/g" $(INCDIR)/libmwfn.h
 	@echo "The header libmwfn.h is put in $(INCDIR)/."
 
 # --- Compilation Rule ---
