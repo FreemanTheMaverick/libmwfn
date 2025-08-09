@@ -24,13 +24,18 @@
 
 double Mwfn::getNumElec(int spin){
 	double nelec = 0;
-	if ( spin == 0 ){ // Total number of electrons if spin == 0.
-		for ( int i = 0; i < (int)this->Orbitals.size(); i++ )
-			nelec += this->Orbitals[i].Occ;
-	}else{
-		__Check_Spin_Type_Shift__
-		for ( int i = 0; i < this->getNumIndBasis(); i++ )
-			nelec += this->Orbitals[i + shift].Occ;
+	for ( int i = 0; i < this->getNumBasis(); i++ ){
+		if ( spin == 0 ) nelec += this->Orbitals[i].Occ; // Total number of electrons if spin == 0.
+		else{
+			if ( this->Wfntype == 0 ) nelec += this->Orbitals[i].Occ / 2;
+			else if ( this->Wfntype == 1 ){
+				if ( spin == 1 ) nelec += this->Orbitals[i].Occ;
+				else if ( spin == 2 ) nelec += this->Orbitals[i + this->getNumIndBasis()].Occ;
+			}else if ( this->Wfntype == 2 ){
+				if ( spin == 1 ) nelec += this->Orbitals[i].Occ > 0 ? 1 : 0;
+				else if ( spin == 2) nelec += this->Orbitals[i].Occ > 1 ? 1 : 0;
+			}
+		}
 	}
 	return nelec;
 }
@@ -55,7 +60,7 @@ int Mwfn::getNumBasis(){
 }
 
 int Mwfn::getNumIndBasis(){
-	return this->Orbitals.size() / ( this->Wfntype == 0 ? 1 : 2);
+	return this->Orbitals.size() / ( this->Wfntype == 1 ? 2 : 1);
 }
 
 int Mwfn::getNumPrims(){
@@ -82,45 +87,70 @@ int Mwfn::getNumPrimShells(){
 }
 
 Eigen::MatrixXd Mwfn::getCoefficientMatrix(int spin){
-	__Check_Spin_Type_Shift__
 	Eigen::MatrixXd matrix = Eigen::MatrixXd::Zero(this->getNumBasis(), this->getNumIndBasis());
-	for ( int jcol = 0; jcol < this->getNumIndBasis(); jcol++ )
-		matrix.col(jcol) = this->Orbitals[jcol + shift].Coeff;
+	for ( int jcol = 0; jcol < this->getNumIndBasis(); jcol++ ){
+		if ( spin == 0 ) throw std::runtime_error("You must specify a spin index for \"Mwfn::getCoefficientMatrix(int spin)\".");
+		else if ( spin == 1 || this->Wfntype == 0 || this->Wfntype == 2 ) matrix.col(jcol) = this->Orbitals[jcol].Coeff;
+		else if ( spin == 2 ) matrix.col(jcol) = this->Orbitals[jcol + this->getNumIndBasis()].Coeff;
+	}
 	return matrix;
 }
 
 void Mwfn::setCoefficientMatrix(Eigen::MatrixXd matrix, int spin){
-	__Check_Spin_Type_Shift__
-	for ( int jcol = 0; jcol < this->getNumIndBasis(); jcol++ )
-		this->Orbitals[jcol + shift].Coeff = matrix.col(jcol);
+	for ( int jcol = 0; jcol < this->getNumIndBasis(); jcol++ ){
+		if ( spin == 0 ) throw std::runtime_error("You must specify a spin index for \"Mwfn::setCoefficientMatrix(Eigen::MatrixXd matrix, int spin)\".");
+		else if ( spin == 1 || this->Wfntype == 0 || this->Wfntype == 2 ) this->Orbitals[jcol].Coeff = matrix.col(jcol);
+		else if ( spin == 2 ) this->Orbitals[jcol + this->getNumIndBasis()].Coeff = matrix.col(jcol);
+	}
 }
 
 Eigen::VectorXd Mwfn::getEnergy(int spin){
-	__Check_Spin_Type_Shift__
 	Eigen::VectorXd energies(this->getNumIndBasis());
-	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ )
-		energies(iorbital) = this->Orbitals[iorbital + shift].Energy;
+	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ ){
+		if ( spin == 0 ) throw std::runtime_error("You must specify a spin index for \"Mwfn::getEnergy(int spin)\".");
+		if ( spin == 1 || this->Wfntype == 0 || this->Wfntype == 2 ) energies(iorbital) = this->Orbitals[iorbital].Energy;
+		if ( spin == 2 ) energies(iorbital) = this->Orbitals[iorbital + this->getNumIndBasis()].Energy;
+	}
 	return energies;
 }
 
 void Mwfn::setEnergy(Eigen::VectorXd energies, int spin){
-	__Check_Spin_Type_Shift__
-	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ )
-		this->Orbitals[iorbital + shift].Energy = energies(iorbital);
+	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ ){
+		if ( spin == 0 ) throw std::runtime_error("You must specify a spin index for \"Mwfn::setEnergy(Eigen::VectorXd energies, int spin)\".");
+		if ( spin == 1 || this->Wfntype == 0 || this->Wfntype == 2 ) this->Orbitals[iorbital].Energy = energies(iorbital);
+		if ( spin == 2 ) this->Orbitals[iorbital + this->getNumIndBasis()].Energy = energies(iorbital);
+	}
 }
 
 Eigen::VectorXd Mwfn::getOccupation(int spin){
-	__Check_Spin_Type_Shift__
 	Eigen::VectorXd occupancies(this->getNumIndBasis());
-	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ )
-		occupancies(iorbital) = this->Orbitals[iorbital + shift].Occ;
+	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ ){
+		if ( spin == 0 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ;
+		else{
+			if ( this->Wfntype == 0 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ / 2;
+			else if ( this->Wfntype == 1 ){
+				if ( spin == 1 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ;
+				else if ( spin == 2 ) occupancies(iorbital) = this->Orbitals[iorbital + this->getNumIndBasis()].Occ;
+			}else if ( this->Wfntype == 2 ){
+				if ( spin == 1 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ > 0 ? 1 : 0;
+				else if ( spin == 2 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ > 1 ? 1 : 0;
+			}
+		}
+	}
 	return occupancies;
 }
 
 void Mwfn::setOccupation(Eigen::VectorXd occupancies, int spin){
-	__Check_Spin_Type_Shift__
-	for ( int iorbital = 0; iorbital < std::min((int)occupancies.size(), this->getNumIndBasis()); iorbital++ )
-		this->Orbitals[iorbital + shift].Occ = occupancies(iorbital);
+	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ ){
+		if ( spin == 0 ) this->Orbitals[iorbital].Occ = occupancies(iorbital);
+		else{
+			if ( this->Wfntype == 0 ) this->Orbitals[iorbital].Occ = occupancies(iorbital) * 2;
+			else if ( this->Wfntype == 1 ){
+				if ( spin == 1 ) this->Orbitals[iorbital].Occ = occupancies(iorbital);
+				else if ( spin == 2 ) this->Orbitals[iorbital + this->getNumIndBasis()].Occ = occupancies(iorbital);
+			}else if ( this->Wfntype == 2 ) throw std::runtime_error("You cannot set occupation numbers with spin != 0!");
+		}
+	}
 }
 
 Eigen::MatrixXd Mwfn::getFock(int spin){
@@ -259,8 +289,9 @@ std::vector<std::vector<int>> Mwfn::Shell2BasisList(){
 
 std::vector<int> Mwfn::getSpins(){
 	switch ( this->Wfntype ){
-		case 0: return std::vector<int>{0};
-		case 1: return std::vector<int>{1, 2};
+		case 0: return std::vector<int>{1};
+		case 1:
+		case 2: return std::vector<int>{1, 2};
 		default: throw std::runtime_error("Invalid wavefunction type!");
 	}
 }
