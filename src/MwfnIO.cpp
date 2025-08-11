@@ -599,7 +599,7 @@ void Mwfn::PrintCenters(){
 
 void Mwfn::PrintOrbitals(){
 	std::printf("Orbitals:\n");
-	if ( this->Wfntype == 0 ){
+	if ( this->Wfntype == 0 || this->Wfntype == 2){
 		std::printf("| Number | Energy (eV) | Occupation |\n");
 		for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++){
 			MwfnOrbital& orbital = this->Orbitals[iorbital];
