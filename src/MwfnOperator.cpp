@@ -32,8 +32,8 @@ double Mwfn::getNumElec(int spin){
 				if ( spin == 1 ) nelec += this->Orbitals[i].Occ;
 				else if ( spin == 2 ) nelec += this->Orbitals[i + this->getNumIndBasis()].Occ;
 			}else if ( this->Wfntype == 2 ){
-				if ( spin == 1 ) nelec += this->Orbitals[i].Occ > 0 ? 1 : 0;
-				else if ( spin == 2) nelec += this->Orbitals[i].Occ > 1 ? 1 : 0;
+				if ( this->Orbitals[i].Type == 0 ) nelec += this->Orbitals[i].Occ / 2;
+				else if ( this->Orbitals[i].Type == spin ) nelec += this->Orbitals[i].Occ;
 			}
 		}
 	}
@@ -124,6 +124,7 @@ void Mwfn::setEnergy(Eigen::VectorXd energies, int spin){
 
 Eigen::VectorXd Mwfn::getOccupation(int spin){
 	Eigen::VectorXd occupancies(this->getNumIndBasis());
+	occupancies.setZero();
 	for ( int iorbital = 0; iorbital < this->getNumIndBasis(); iorbital++ ){
 		if ( spin == 0 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ;
 		else{
@@ -132,8 +133,8 @@ Eigen::VectorXd Mwfn::getOccupation(int spin){
 				if ( spin == 1 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ;
 				else if ( spin == 2 ) occupancies(iorbital) = this->Orbitals[iorbital + this->getNumIndBasis()].Occ;
 			}else if ( this->Wfntype == 2 ){
-				if ( spin == 1 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ > 0 ? 1 : 0;
-				else if ( spin == 2 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ > 1 ? 1 : 0;
+				if ( this->Orbitals[iorbital].Type == 0 ) occupancies(iorbital) = this->Orbitals[iorbital].Occ / 2;
+				else if ( this->Orbitals[iorbital].Type == spin ) occupancies(iorbital) = this->Orbitals[iorbital].Occ;
 			}
 		}
 	}

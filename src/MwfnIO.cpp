@@ -16,7 +16,6 @@
 #include "MwfnOrbital.h"
 #include "Mwfn.h"
 
-#include <iostream>
 #define __Construct_Orbitals__\
 	this->Orbitals.resize(nindbasis * ( this->Wfntype == 1 ? 2 : 1 ));\
 	for ( MwfnOrbital& orbital : this->Orbitals ){\
