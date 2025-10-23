@@ -359,13 +359,8 @@ void Mwfn::Export(std::string mwfn_filename){
 	std::fprintf(file, "\n\n# Overview\n");
 	std::fprintf(file, "Wfntype= %d\n", this->Wfntype);
 	std::fprintf(file, "Charge= %f\n", this->getCharge());
-	if ( this->Wfntype == 0 ){
-		std::fprintf(file, "Naelec= %f\n", this->getNumElec() / 2);
-		std::fprintf(file, "Nbelec= %f\n", this->getNumElec() / 2);
-	}else{
-		std::fprintf(file, "Naelec= %f\n", this->getNumElec(1));
-		std::fprintf(file, "Nbelec= %f\n", this->getNumElec(2));
-	}
+	std::fprintf(file, "Naelec= %f\n", this->getNumElec(1));
+	std::fprintf(file, "Nbelec= %f\n", this->getNumElec(2));
 	if ( this->E_tot != -114514 )
 		std::fprintf(file, "E_tot= %f\n", this->E_tot);
 	if ( this->VT_ratio != -114514 )
