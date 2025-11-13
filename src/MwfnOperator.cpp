@@ -297,6 +297,24 @@ std::vector<int> Mwfn::getSpins(){
 	}
 }
 
+int Mwfn::getNumSpins(){
+	if ( this->Wfntype == 0 ) return 1;
+	else if ( this->Wfntype == 1 ) return 2;
+	else if ( this->Wfntype == 2 ){
+		int nd = 0; int na = 0; int nb = 0;
+		for ( auto& orbital : this->Orbitals ){
+			if ( orbital.Occ > 0 ) switch (orbital.Type){
+				case 0: nd++; break;
+				case 1: na++; break;
+				case 2: nb++; break;
+		    }
+		}
+		return (int)(nd > 0) + (int)(na > 0) + (int)(nb > 0);
+	}else throw std::runtime_error("Invalid Wfntype!");
+	return 0;
+}
+
+
 static Eigen::MatrixXd GramSchmidt(Eigen::MatrixXd C, Eigen::MatrixXd S){
 	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(S);
 	const Eigen::MatrixXd Ssqrt = es.operatorSqrt();

@@ -47,6 +47,7 @@ class Mwfn{ public:
 
 	MwfnShell& getShell(int ishell); // The reference to the i^th shell.
 	std::vector<int> getSpins(); // A list of spin indeces of the current wavefunction type. [0] for Wfntype = 0; [1, 2] for Wfntype = 1.
+	int getNumSpins();
 	void Orthogonalize(std::string scheme); // Orthogonalize the orbitals in the scheme of "GramSchmidt" or "Lowdin".
 
 	std::unique_ptr<Mwfn> Clone();
