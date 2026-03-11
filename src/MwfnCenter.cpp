@@ -22,6 +22,10 @@ int MwfnCenter::getNumBasis(){
 	return nbasis;
 }
 
+int MwfnCenter::getNumPseudos(){
+	return this->Pseudos.size();
+}
+
 std::string MwfnCenter::getSymbol(){
 	__Z_2_Name__
 	return Z2Name[this->Index];
@@ -31,9 +35,11 @@ void MwfnCenter::Print(){
 	std::printf("Symbol: %s\n", this->getSymbol().c_str());
 	std::printf("Index: %d\n", this->Index);
 	std::printf("Nuclear charge: %f\n", this->Nuclear_charge);
-	std::printf("Coordinates (a.u.): %f %f %f\n", this->Coordinates[0], this->Coordinates[1], this->Coordinates[2]);
-	std::printf("Shells:\n");
+	std::printf("Coordinates (a.u.): % f % f % f\n", this->Coordinates[0], this->Coordinates[1], this->Coordinates[2]);
+	std::printf("Basis shells:\n");
 	for ( MwfnShell& shell : this->Shells ) shell.Print();
+	std::printf("Pseudopotentials:\n");
+	for ( MwfnPseudo& pseudo : this->Pseudos ) pseudo.Print();
 }
 
 #ifdef PYTHON
@@ -43,9 +49,11 @@ void Init_MwfnCenter(pybind11::module_& m){
 		.def_readwrite("Nuclear_charge", &MwfnCenter::Nuclear_charge)
 		.def_readwrite("Coordinates", &MwfnCenter::Coordinates)
 		.def_readwrite("Shells", &MwfnCenter::Shells)
+		.def_readwrite("Pseudos", &MwfnCenter::Pseudos)
 		.def(pybind11::init<>())
 		.def("getNumShells", &MwfnCenter::getNumShells)
 		.def("getNumBasis", &MwfnCenter::getNumBasis)
+		.def("getNumPseudos", &MwfnCenter::getNumPseudos)
 		.def("getSymbol", &MwfnCenter::getSymbol)
 		.def("Print", &MwfnCenter::Print);
 }

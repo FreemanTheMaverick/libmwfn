@@ -24,7 +24,7 @@ void MwfnShell::Print(){
 	std::printf("Type: %d\n", this->Type);
 	std::printf("Exponents and Coefficients:\n");
 	for ( int i = 0; i < this->getNumPrims(); i++ )
-		std::printf("%f %f\n", this->Exponents[i], this->Coefficients[i]);
+		std::printf("% f % f\n", this->Exponents[i], this->Coefficients[i]);
 }
 
 #ifdef PYTHON
@@ -37,5 +37,7 @@ void Init_MwfnShell(pybind11::module_& m){
 		.def("getSize", &MwfnShell::getSize)
 		.def("getNumPrims", &MwfnShell::getNumPrims)
 		.def("Print", &MwfnShell::Print);
+	pybind11::class_<MwfnPseudo, MwfnShell>(m, "MwfnPseudo")
+		.def_readwrite("Powers", &MwfnPseudo::Powers);
 }
 #endif

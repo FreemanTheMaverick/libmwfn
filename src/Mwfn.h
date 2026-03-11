@@ -23,6 +23,7 @@ class Mwfn{ public:
 	int getNumPrims();
 	int getNumShells(); // Number of shells.
 	int getNumPrimShells();
+	int getNumPseudos();
 
 	Eigen::MatrixXd getCoefficientMatrix(int spin = 0);
 	void setCoefficientMatrix(Eigen::MatrixXd matrix, int spin = 0);
@@ -56,7 +57,7 @@ class Mwfn{ public:
 	void Export(std::string mwfn_filename);
 	void PrintCenters();
 	void PrintOrbitals();
-	void setBasis(std::string basis_filename); // Advanced.
+	void setBasis(std::string basis_filename, std::string pseudo_filename); // Advanced.
 	void setCenters(std::vector<std::vector<double>> atoms); // Advanced.
 	std::tuple<double, Eigen::MatrixXd, Eigen::MatrixXd> NuclearRepulsion(); // Nuclear repulsion energy and its first two nuclear derivatives.
 };

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <map>
@@ -546,18 +547,80 @@ std::vector<MwfnCenter> MwfnReadBasis(std::string basis_file_path_name){
 	return centers;
 }
 
-void Mwfn::setBasis(std::string basis_filename){
-	std::vector<MwfnCenter> bare_centers = MwfnReadBasis(basis_filename);
+std::vector<MwfnCenter> MwfnReadPseudo(std::string pseudo_file_path_name){
+	std::ifstream file( pseudo_file_path_name.c_str() );
+	if (!file.good()) throw std::runtime_error("Pseudopotential file is missing!");
+	std::string line, word;
+	std::vector<MwfnCenter> centers={};
+	MwfnCenter center;
+	__Name_2_Z__
+	while ( std::getline(file, line) ){
+		if ( line.size() == 0 ) continue;
+		std::stringstream ss(line);
+		ss >> word; std::transform(word.begin(), word.end(), word.begin(), ::toupper);
+		if ( word == "NEWECP" ){
+			ss >> word; std::transform(word.begin(), word.end(), word.begin(), ::toupper);
+			center.Index = Name2Z[word];
+		}else if ( word == "N_CORE" ){
+			ss >> word;
+			center.Nuclear_charge = std::stoi(word);
+		}else if (
+				word == "S" ||  word == "P" || word == "D" ||
+				word == "F" || word == "G"  || word == "H" || word == "I" ){
+			MwfnPseudo pseudo;
+			if ( word == "S" ) pseudo.Type = 0;
+			else if ( word == "P" ) pseudo.Type = 1;
+			else if ( word == "D" ) pseudo.Type = 2;
+			else if ( word == "F" ) pseudo.Type = 3;
+			else if ( word == "G" ) pseudo.Type = 4;
+			else if ( word == "H" ) pseudo.Type = 5;
+			else if ( word == "I" ) pseudo.Type = 6;
+			ss >> word;
+			int n = std::stoi(word);
+			for ( int i = 0; i < n; i++ ){
+				std::getline(file, line);
+				std::stringstream ss(line);
+				ss >> word;
+				ss >> word;
+				pseudo.Exponents.push_back(std::stod(word));
+				ss >> word;
+				pseudo.Coefficients.push_back(std::stod(word));
+				ss >> word;
+				pseudo.Powers.push_back(std::stoi(word));
+				pseudo.NormalizedCoefficients.push_back(0);
+			}
+			center.Pseudos.push_back(pseudo);
+		}else if ( word == "END" ){
+			centers.push_back(center);
+			center.Pseudos.resize(0);
+		}
+	}
+	return centers;
+}
+
+void Mwfn::setBasis(std::string basis_filename, std::string pseudo_filename){
+	std::vector<MwfnCenter> bf_bare_centers;
+	std::vector<MwfnCenter> pp_bare_centers;
+	if ( basis_filename.size() > 0 ) bf_bare_centers = MwfnReadBasis(basis_filename);
+	if ( pseudo_filename.size() > 0 ) pp_bare_centers = MwfnReadPseudo(pseudo_filename);
 	for ( MwfnCenter& mwfn_center : this->Centers ){
 		bool found = 0;
-		for ( MwfnCenter& bare_center : bare_centers ){
+		for ( MwfnCenter& bare_center : bf_bare_centers ){
 			if ( mwfn_center.Index == bare_center.Index ){
 				mwfn_center.Shells = bare_center.Shells;
 				found = 1;
 				break;
 			}
 		}
-		if (!found) throw std::runtime_error("Basis set file does not include this element!");
+		if (!found) std::cerr << "Basis set file does not include " << mwfn_center.getSymbol() << "!" << std::endl;
+		for ( MwfnCenter& bare_center : pp_bare_centers ){
+			if ( mwfn_center.Index == bare_center.Index ){
+				mwfn_center.Nuclear_charge = mwfn_center.Index - bare_center.Nuclear_charge;
+				mwfn_center.Pseudos = bare_center.Pseudos;
+				found = 1;
+				break;
+			}
+		}
 	}
 }
 

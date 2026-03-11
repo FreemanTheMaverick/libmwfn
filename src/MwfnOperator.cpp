@@ -79,6 +79,13 @@ int Mwfn::getNumShells(){
 	return nshells;
 }
 
+int Mwfn::getNumPseudos(){
+	int npseudos = 0;
+	for ( MwfnCenter& center : this->Centers )
+		npseudos += center.Pseudos.size();
+	return npseudos;
+}
+
 int Mwfn::getNumPrimShells(){
 	int nprimshells = 0;
 	for ( MwfnCenter& center : this->Centers ) for ( MwfnShell& shell : center.Shells )

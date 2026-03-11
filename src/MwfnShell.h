@@ -7,3 +7,7 @@ class MwfnShell{ public:
 	int getNumPrims(); // Number of primitive gaussians.
 	void Print();
 };
+
+class MwfnPseudo: public MwfnShell{ public:
+	std::vector<int> Powers = {};
+};

@@ -30,6 +30,7 @@ void Init_Mwfn(pybind11::module_& m){
 		.def("getNumIndBasis", &Mwfn::getNumIndBasis)
 		.def("getNumPrims", &Mwfn::getNumPrims)
 		.def("getNumShells", &Mwfn::getNumShells)
+		.def("getNumPseudos", &Mwfn::getNumPseudos)
 		.def("getNumPrimShells", &Mwfn::getNumPrimShells)
 		.def("getCoefficientMatrix", &Mwfn::getCoefficientMatrix, pybind11::arg("spin") = 0)
 		.def("setCoefficientMatrix", &Mwfn::setCoefficientMatrix, pybind11::arg("matrix"), pybind11::arg("spin") = 0)
