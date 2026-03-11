@@ -1,9 +1,9 @@
 # --- Compiler ---
-CXX = __CXX__
+CXX         = __CXX__
 # Note: MAKE is implicitly defined, no need to export unless overriding
 
 # --- Paths to Dependencies ---
-EIGEN3_PATH    = __EIGEN3__
+EIGEN3_PATH = __EIGEN3__
 # Eigen3: The path where you can find "Eigen/", "signature_of_eigen3_matrix_library" and "unsupported/".
 
 # --- Project Structure ---
@@ -36,11 +36,12 @@ all: $(OBJECTS) | $(INCDIR) $(LIBDIR)
 	ar -rv $(LIBDIR)/libmwfn.a $^
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -o $(LIBDIR)/libmwfn.so $^
 	@echo "The lib files libmwfn.a and libmwfn.so are put in $(LIBDIR)/."
-	cat src/NecessaryHeaders.h > $(INCDIR)/libmwfn.h
-	cat src/MwfnShell.h       >> $(INCDIR)/libmwfn.h
-	cat src/MwfnCenter.h      >> $(INCDIR)/libmwfn.h
-	cat src/MwfnOrbital.h     >> $(INCDIR)/libmwfn.h
-	cat src/Mwfn.h            >> $(INCDIR)/libmwfn.h
+	echo "#pragma once"         > $(INCDIR)/libmwfn.h
+	cat src/NecessaryHeaders.h >> $(INCDIR)/libmwfn.h
+	cat src/MwfnShell.h        >> $(INCDIR)/libmwfn.h
+	cat src/MwfnCenter.h       >> $(INCDIR)/libmwfn.h
+	cat src/MwfnOrbital.h      >> $(INCDIR)/libmwfn.h
+	cat src/Mwfn.h             >> $(INCDIR)/libmwfn.h
 	@echo "The header libmwfn.h is put in $(INCDIR)/."
 
 # --- Compilation Rule ---
